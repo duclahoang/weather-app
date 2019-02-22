@@ -1,7 +1,11 @@
 require('dotenv').config();
-let key = process.env.KEY;
-const request = require('request');
+let key_googleapis = process.env.KEY_googleapis;
+
 const yargs = require('yargs');
+const request = require('request');
+const geocode = require('./geocode/geocode');
+const weather = require('./weather/weather');
+
 const argv = yargs
   .options({
     a: {
@@ -15,19 +19,33 @@ const argv = yargs
   .alias('help','h')
   .argv;
 
-let encodedAddress = encodeURIComponent(argv.address);
-request({
-  url: `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedAddress}&key=${key}`,
-  json: true
-}, (error, response, body) => {
-  if (error) {
-    console.log('Unable to connect google server');
-  } else if (body.status === 'ZERO_RESULTS') {
-    console.log('Unable to find address');
-  } else if(body.status === 'OK') {
-    console.log(`Adress: ${body.results[0].formatted_address}`);
-    console.log(`Latitude: ${body.results[0].geometry.location.lat}`);
-    console.log(`Longitude: ${body.results[0].geometry.location.lng}`);
-  }
+// geocode.geocodeAddress(argv.address,(errorMessage,results)=> {
+//   if(errorMessage) {
+//     console.log(errorMessage);
+//   }
+//   else {
+//     console.log(JSON.stringify(results, undefined, 2));
+//     weather.getWeather(results.latitude,results.longitude,(errorMessage, results) => {
+//       if(errorMessage) {
+//         console.log(errorMessage);
+//       }
+//       else {
+//         console.log(JSON.stringify(results, undefined, 2));
+//       }
+//     });
+//   }
+// });
 
+geocode.geocodeAddressAsync(argv.address).then((results) => {
+  console.log(JSON.stringify(results, undefined, 2));
+      weather.getWeather(results.latitude,results.longitude,(errorMessage, results) => {
+        if(errorMessage) {
+          console.log(errorMessage);
+        }
+        else {
+          console.log(JSON.stringify(results, undefined, 2));
+        }
+      });
+}, (errorMessage) => {
+  console.log(errorMessage);
 });
