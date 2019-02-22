@@ -35,6 +35,7 @@ axios.get(geocodeUrl).then((response) => {
 }).then((response) => {
   let temperature = response.data.currently.temperature;
   console.log(`temperature: ${temperature}`);
+
 }).catch((e) => {
   if(e.code === 'ENOTFOUND') {
     console.log('Unable to connect api!');
