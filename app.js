@@ -36,6 +36,7 @@ const argv = yargs
 //   }
 // });
 
+// use promise instead of traditional arrow function
 geocode.geocodeAddressAsync(argv.address).then((results) => {
   console.log(JSON.stringify(results, undefined, 2));
       weather.getWeather(results.latitude,results.longitude,(errorMessage, results) => {
